@@ -1,3 +1,4 @@
+// based on https://github.com/hidjou/classsed-react-firebase-functions/blob/master/functions/util/fbAuth.js
 //helper function for detecting empty strings
 const isEmpty = (string) => {
     if (string.trim() === '')

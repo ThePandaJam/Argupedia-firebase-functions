@@ -1,3 +1,5 @@
+// based on https://github.com/hidjou/classsed-react-firebase-functions/blob/master/functions/util/fbAuth.js
+
 const { admin, db } = require('./admin')
 
 //checks authentication for private routes and other uses

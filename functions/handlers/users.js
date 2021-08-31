@@ -1,3 +1,4 @@
+// based on https://github.com/hidjou/classsed-react-firebase-functions/blob/master/functions/handlers/users.js
 const {db, admin} = require('../util/admin');
 
 const config = require('../util/config')

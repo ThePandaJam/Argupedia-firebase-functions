@@ -1,3 +1,4 @@
+//based on https://github.com/hidjou/classsed-react-firebase-functions/blob/master/functions/handlers/screams.js 
 const { db } = require('../util/admin')
 
 exports.getAllPosts = (req, res) => {
