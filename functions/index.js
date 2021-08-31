@@ -2,6 +2,9 @@ const functions = require("firebase-functions");
 const app = require('express')();
 const FBAuth = require('./util/fbAuth');
 
+const cors = require('cors');
+app.use(cors());
+
 const { db } = require('./util/admin')
 
 const { 
@@ -105,7 +108,7 @@ exports.createNotificationOnArgument = functions
                         sender: snapshot.data().userHandle,
                         type: 'argument',
                         read: false,
-                        postId: doc.id
+                        postId: snapshot.data().postId
                     });
                 }
             })
