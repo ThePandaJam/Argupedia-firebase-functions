@@ -1,5 +1,6 @@
 //based on https://github.com/hidjou/classsed-react-firebase-functions/blob/master/functions/handlers/screams.js 
 const { db } = require('../util/admin')
+const { validatePostData } = require('../util/validators')
 
 exports.getAllPosts = (req, res) => {
     db.collection('posts')
@@ -23,7 +24,7 @@ exports.postOnePost = (req, res) => {
     if(req.body.body.trim() === ''){
         return res.status(400).json({ body: 'Post title must not be empty' });
     }
-    
+    //TODO: change body to title and add scheme
     const newPost = {
         body: req.body.body,
         userHandle: req.user.handle,
@@ -86,7 +87,8 @@ exports.addArgumentToPost = (req, res) => {
         createdAt: new Date().toISOString(),
         postId: req.params.postId,
         userHandle: req.user.handle,
-        userImage: req.user.imageUrl
+        userImage: req.user.imageUrl,
+        argumentScore: 0
     };
     //confirm that the post exists
     db.doc(`/posts/${req.params.postId}`).get()
@@ -157,7 +159,7 @@ exports.upvotePost = (req, res) => {
         })
 
 }
-//remove an upvote
+//remove an upvote from post
 exports.unUpvotePost = (req, res) => {
     const upvoteDocument = db
         .collection('upvotes')
@@ -296,6 +298,55 @@ exports.unDownvotePost = (req, res) => {
             console.error(err)
             res.status(500).json({ error: err.code });
         })
+}
+
+//upvote a comment (argument)
+exports.upvoteArgument = (req, res) => {
+    const upvoteArgumentDocument = db
+        .collection('argumentUpvotes')
+        .where('userHandle', '==', req.user.handle)
+        .where('argumentId', '==', req.params.argumentId)
+        .limit(1);
+
+    const argumentDocument = db.doc(`/arguments/${req.params.argumentId}`);
+
+    let argumentData = {}
+
+    argumentDocument
+        .get()
+        .then((doc) => {
+            if(doc.exists){
+                argumentData = doc.data();
+                argumentData.argumentId = doc.id;
+                return upvoteArgumentDocument.get();
+            } else {
+                return res.status(404).json({ error: 'Argument not found' });
+            }
+        })
+        .then(data => {
+            if (data.empty){
+                return db
+                    .collection('argumentUpvotes')
+                    .add({
+                        argumentId: req.params.argumentId,
+                        userHandle: req.user.handle
+                    })
+                    .then(() => {
+                        argumentData.argumentScore++
+                        return argumentDocument.update({ argumentScore: argumentData.argumentScore });
+                    })
+                    .then(()=> {
+                        return res.json(argumentData);
+                    })
+            } else {
+                return res.status(400).json({ error: 'Argument already upvoted'});
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: err.code });
+        })
+
 }
 
 //delete post

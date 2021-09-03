@@ -53,6 +53,35 @@ exports.validateLoginData = (data) => {
     }
 }
 
+exports.validatePostData = (data) => {
+    let errors = {};
+
+    if(isEmpty(data.title)) {
+        errors.email = 'Must not be empty'
+    }
+
+    if(isEmpty(data.scheme)) {
+        errors.password = 'Select a scheme'
+    }
+
+    if(isEmpty(data.majorPremise)) {
+        errors.handle = 'Must not be empty'
+    }
+
+    if(isEmpty(data.minorPremise)) {
+        errors.handle = 'Must not be empty'
+    }
+
+    if(isEmpty(data.conclusion)) {
+        errors.handle = 'Must not be empty'
+    }
+    
+    return {
+        errors,
+        valid: Object.keys(errors).length === 0 ? true : false
+    }
+}
+
 exports.reduceUserDetails = (data) => {
     let userDetails = {};
     //check that bio is not empty

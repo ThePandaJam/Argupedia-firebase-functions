@@ -16,7 +16,8 @@ const {
     unUpvotePost,
     downvotePost,
     unDownvotePost,
-    deletePost
+    deletePost,
+    upvoteArgument
 } = require('./handlers/posts')
 
 const { 
@@ -33,13 +34,16 @@ const {
 app.get('/posts', getAllPosts)
 app.post('/post', FBAuth, postOnePost);
 app.get('/post/:postId', getPost);
-//TODO: check if the user has already downvoted the post, if yes, remove the downvote and add the upvote instead
+// rate posts routes
 app.get('/post/:postId/upvote', FBAuth, upvotePost);
 app.get('/post/:postId/unupvote', FBAuth, unUpvotePost);
-//TODO: check if the user has already upvoted the post, if yes, remove the upvote and add the downvote instead
 app.get('/post/:postId/downvote', FBAuth, downvotePost);
 app.get('/post/:postId/undownvote', FBAuth, unDownvotePost);
+// delete post routes
 app.post('/post/:postId/argument', FBAuth, addArgumentToPost);
+// rate comments routes
+app.get('/argument/:argumentId/upvote', FBAuth, upvoteArgument);
+// delete post route
 app.delete('/post/:postId', FBAuth, deletePost);
 
 
