@@ -17,7 +17,10 @@ const {
     downvotePost,
     unDownvotePost,
     deletePost,
-    upvoteArgument
+    upvoteArgument,
+    unUpvoteArgument,
+    downvoteArgument,
+    unDownvoteArgument
 } = require('./handlers/posts')
 
 const { 
@@ -43,6 +46,10 @@ app.get('/post/:postId/undownvote', FBAuth, unDownvotePost);
 app.post('/post/:postId/argument', FBAuth, addArgumentToPost);
 // rate comments routes
 app.get('/argument/:argumentId/upvote', FBAuth, upvoteArgument);
+app.get('/argument/:argumentId/unupvote', FBAuth, unUpvoteArgument);
+app.get('/argument/:argumentId/downvote', FBAuth, downvoteArgument);
+app.get('/argument/:argumentId/undownvote', FBAuth, unDownvoteArgument);
+
 // delete post route
 app.delete('/post/:postId', FBAuth, deletePost);
 

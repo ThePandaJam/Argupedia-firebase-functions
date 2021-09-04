@@ -348,6 +348,144 @@ exports.upvoteArgument = (req, res) => {
         })
 
 }
+//remove upvote form comment (argument)
+exports.unUpvoteArgument = (req, res) => {
+    const upvoteArgumentDocument  = db
+        .collection('argumentUpvotes')
+        .where('userHandle', '==', req.user.handle)
+        .where('argumentId', '==', req.params.argumentId)
+        .limit(1);
+
+    const argumentDocument = db.doc(`/arguments/${req.params.argumentId}`);
+
+    let argumentData  = {}
+
+    argumentDocument
+        .get()
+        .then((doc) => {
+            if(doc.exists){
+                argumentData  = doc.data();
+                argumentData.argumentId = doc.id;
+                return upvoteArgumentDocument.get();
+            } else {
+                return res.status(404).json({ error: 'Argument not found' });
+            }
+        })
+        .then(data => {
+            if (data.empty){
+                return res.status(400).json({ message: 'Argument not upvoted'});
+            } else {
+                return db
+                    .doc(`/argumentUpvotes/${data.docs[0].id}`)
+                    .delete()
+                    .then(() => {
+                        argumentData.argumentScore--;
+                        return argumentDocument.update({ argumentScore: argumentData.argumentScore });
+                    })
+                    .then(()=> {
+                        return res.json(argumentData);
+                    })
+            }
+        })
+        .catch(err => {
+            console.error(err)
+            res.status(500).json({ error: err.code });
+        })
+}
+
+//downvote a comment (argument)
+exports.downvoteArgument = (req, res) => {
+    const downvoteArgumentDocument = db
+        .collection('argumentDownvotes')
+        .where('userHandle', '==', req.user.handle)
+        .where('argumentId', '==', req.params.argumentId)
+        .limit(1);
+
+    const argumentDocument = db.doc(`/arguments/${req.params.argumentId}`);
+
+    let argumentData = {}
+
+    argumentDocument
+        .get()
+        .then((doc) => {
+            if(doc.exists){
+                argumentData = doc.data();
+                argumentData.argumentId = doc.id;
+                return downvoteArgumentDocument.get();
+            } else {
+                return res.status(404).json({ error: 'Argument not found' });
+            }
+        })
+        .then(data => {
+            if (data.empty){
+                return db
+                    .collection('argumentDownvotes')
+                    .add({
+                        argumentId: req.params.argumentId,
+                        userHandle: req.user.handle
+                    })
+                    .then(() => {
+                        argumentData.argumentScore--
+                        return argumentDocument.update({ argumentScore: argumentData.argumentScore });
+                    })
+                    .then(()=> {
+                        return res.json(argumentData);
+                    })
+            } else {
+                return res.status(400).json({ error: 'Argument already downvoted'});
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: err.code });
+        })
+
+}
+
+//remove downvote form comment (argument)
+exports.unDownvoteArgument = (req, res) => {
+    const downvoteArgumentDocument  = db
+        .collection('argumentDownvotes')
+        .where('userHandle', '==', req.user.handle)
+        .where('argumentId', '==', req.params.argumentId)
+        .limit(1);
+
+    const argumentDocument = db.doc(`/arguments/${req.params.argumentId}`);
+
+    let argumentData  = {}
+
+    argumentDocument
+        .get()
+        .then((doc) => {
+            if(doc.exists){
+                argumentData  = doc.data();
+                argumentData.argumentId = doc.id;
+                return downvoteArgumentDocument.get();
+            } else {
+                return res.status(404).json({ error: 'Argument not found' });
+            }
+        })
+        .then(data => {
+            if (data.empty){
+                return res.status(400).json({ message: 'Argument not downvoted'});
+            } else {
+                return db
+                    .doc(`/argumentDownvotes/${data.docs[0].id}`)
+                    .delete()
+                    .then(() => {
+                        argumentData.argumentScore++;
+                        return argumentDocument.update({ argumentScore: argumentData.argumentScore });
+                    })
+                    .then(()=> {
+                        return res.json(argumentData);
+                    })
+            }
+        })
+        .catch(err => {
+            console.error(err)
+            res.status(500).json({ error: err.code });
+        })
+}
 
 //delete post
 exports.deletePost = (req, res) => {
