@@ -102,7 +102,9 @@ exports.addArgumentToPost = (req, res) => {
             return db.collection('arguments').add(newArgument);
         })
         .then(() => {
-            res.json(newArgument);
+            const resArgument = newArgument;
+            resArgument.argumentId = doc.id;
+            res.json(resArgument);
         })
         .catch(err => {
             console.error(err);
