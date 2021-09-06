@@ -172,6 +172,26 @@ exports.getAuthenticatedUser = (req, res) => {
                 userData.downvotes.push(doc.data());
             });
             return db
+                .collection("argumentUpvotes")
+                .where("userHandle", "==", req.user.handle)
+                .get()
+        })
+        .then((data) => {
+            userData.argumentUpvotes = [];
+            data.forEach((doc) => {
+                userData.argumentUpvotes.push(doc.data());
+            });
+            return db
+                .collection("argumentDownvotes")
+                .where("userHandle", "==", req.user.handle)
+                .get()
+        })
+        .then((data) => {
+            userData.argumentDownvotes = [];
+            data.forEach((doc) => {
+                userData.argumentDownvotes.push(doc.data());
+            });
+            return db
                 .collection('notifications')
                 .where('recipient', '==', req.user.handle)
                 .orderBy('createdAt', 'desc')
