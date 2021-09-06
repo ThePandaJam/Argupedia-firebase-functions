@@ -101,7 +101,7 @@ exports.addArgumentToPost = (req, res) => {
         .then(() => {
             return db.collection('arguments').add(newArgument);
         })
-        .then(() => {
+        .then((doc) => {
             const resArgument = newArgument;
             resArgument.argumentId = doc.id;
             res.json(resArgument);
