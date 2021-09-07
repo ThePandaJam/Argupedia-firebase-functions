@@ -15,6 +15,7 @@ let db = {
         {
             userHandle: 'user',
             title: 'this is the post title',
+            scheme: 'Argument from Expert Opinion',
             createdAt: '2021-08-18T13:48:31.998Z',
             userScore: 5,
             argumentCount: 2

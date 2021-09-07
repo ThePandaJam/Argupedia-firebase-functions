@@ -126,6 +126,7 @@ exports.getUserDetails = (req,res) => {
             data.forEach(doc => {
                 userData.posts.push({
                     title: doc.data().title,
+                    scheme: doc.data().scheme,
                     createdAt: doc.data().createdAt,
                     userHandle: doc.data().userHandle,
                     userImage: doc.data().userImage,
