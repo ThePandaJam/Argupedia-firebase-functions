@@ -21,12 +21,12 @@ exports.getAllPosts = (req, res) => {
 }
 
 exports.postOnePost = (req, res) => {
-    if(req.body.body.trim() === ''){
-        return res.status(400).json({ body: 'Post title must not be empty' });
+    if(req.body.title.trim() === ''){
+        return res.status(400).json({ title: 'Post title must not be empty' });
     }
-    //TODO: change body to title and add scheme
+    //TODO: and add scheme
     const newPost = {
-        body: req.body.body,
+        title: req.body.title,
         userHandle: req.user.handle,
         userImage: req.user.imageUrl,
         createdAt: new Date().toISOString(),

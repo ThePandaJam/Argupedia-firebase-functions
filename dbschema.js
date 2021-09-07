@@ -14,7 +14,7 @@ let db = {
     posts: [
         {
             userHandle: 'user',
-            body: 'this is the post body',
+            title: 'this is the post title',
             createdAt: '2021-08-18T13:48:31.998Z',
             userScore: 5,
             argumentCount: 2
