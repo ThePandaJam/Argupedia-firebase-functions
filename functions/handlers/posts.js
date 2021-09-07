@@ -12,7 +12,6 @@ exports.getAllPosts = (req, res) => {
                 posts.push({
                     postId: doc.id,
                     ...doc.data()
-                    //userImage: doc.data().userImage
                 });
             });
             return res.json(posts);
@@ -21,19 +20,21 @@ exports.getAllPosts = (req, res) => {
 }
 
 exports.postOnePost = (req, res) => {
-    if(req.body.title.trim() === ''){
-        return res.status(400).json({ title: 'Post title must not be empty' });
-    }
-    //TODO: and add scheme
+    //validate post fields
     const newPost = {
         title: req.body.title,
+        scheme: req.body.scheme,
         userHandle: req.user.handle,
         userImage: req.user.imageUrl,
         createdAt: new Date().toISOString(),
         userScore: 0,
         argumentCount: 0
-
     }
+    
+    const { valid, errors } = validatePostData(newPost);
+    if (!valid) return res.status(400).json(errors)
+    //TODO: and add scheme
+    
     db.collection('posts')
         .add(newPost)
         .then(doc => {

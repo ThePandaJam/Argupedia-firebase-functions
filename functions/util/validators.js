@@ -57,25 +57,34 @@ exports.validatePostData = (data) => {
     let errors = {};
 
     if(isEmpty(data.title)) {
-        errors.email = 'Must not be empty'
+        errors.title = 'Must not be empty'
     }
 
     if(isEmpty(data.scheme)) {
-        errors.password = 'Select a scheme'
+        errors.scheme = 'Select a scheme'
     }
 
+    return {
+        errors,
+        valid: Object.keys(errors).length === 0 ? true : false
+    }
+}
+
+exports.validateArgumentData = (data) => {
+    let errors = {};
+    
     if(isEmpty(data.majorPremise)) {
-        errors.handle = 'Must not be empty'
+        errors.majorPremise = 'Must not be empty'
     }
 
     if(isEmpty(data.minorPremise)) {
-        errors.handle = 'Must not be empty'
+        errors.minorPremise = 'Must not be empty'
     }
 
     if(isEmpty(data.conclusion)) {
-        errors.handle = 'Must not be empty'
+        errors.conclusion = 'Must not be empty'
     }
-    
+
     return {
         errors,
         valid: Object.keys(errors).length === 0 ? true : false
