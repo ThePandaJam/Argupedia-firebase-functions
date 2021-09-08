@@ -19,6 +19,23 @@ exports.getAllPosts = (req, res) => {
         .catch(err => console.error(err));
 }
 
+exports.getAllSchemes = (req, res) => {
+    db.collection('schemes')
+        .orderBy('listOrder')
+        .get()
+        .then(data => {
+            let schemes = [];
+            data.forEach((doc) => {
+                schemes.push({
+                    schemeId: doc.id,
+                    ...doc.data()
+                });
+            });
+            return res.json(schemes);
+        })
+        .catch(err => console.error(err));
+}
+
 exports.postOnePost = (req, res) => {
     //validate post fields
     const newPost = {
