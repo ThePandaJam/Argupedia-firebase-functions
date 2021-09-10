@@ -1,7 +1,7 @@
 // based on https://github.com/hidjou/classsed-react-firebase-functions/blob/master/functions/util/fbAuth.js
 //helper function for detecting empty strings
 const isEmpty = (string) => {
-    if (string.trim() === '')
+    if (string.trim() === '' || string.trim() === null)
         return true;
     else
         return false;
@@ -62,6 +62,18 @@ exports.validatePostData = (data) => {
 
     if(isEmpty(data.scheme)) {
         errors.scheme = 'Select a scheme'
+    }
+
+    if(isEmpty(data.majorPremise)) {
+        errors.majorPremise = 'Must not be empty'
+    }
+
+    if(isEmpty(data.minorPremise)) {
+        errors.minorPremise = 'Must not be empty'
+    }
+
+    if(isEmpty(data.conclusion)) {
+        errors.conclusion = 'Must not be empty'
     }
 
     return {

@@ -41,6 +41,9 @@ exports.postOnePost = (req, res) => {
     const newPost = {
         title: req.body.title,
         scheme: req.body.scheme,
+        majorPremise: req.body.majorPremise,
+        minorPremise: req.body.minorPremise,
+        conclusion: req.body.conclusion,
         userHandle: req.user.handle,
         userImage: req.user.imageUrl,
         createdAt: new Date().toISOString(),
