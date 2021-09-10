@@ -35,12 +35,30 @@ exports.getAllSchemes = (req, res) => {
         })
         .catch(err => console.error(err));
 }
+//fetch the critical questions for a scheme
+exports.getCriticalQuestions = (req, res) => {
+    let criticalQuestions = []
+    db.doc(`/criticalQuestions/${req.params.schemeId}`)
+        .get()
+        .then(doc => {
+            if(!doc.exists){
+                return res.status(404).json({ error: 'Scheme not found' })
+            }
+            criticalQuestions = doc.data();
+            return res.json( criticalQuestions );
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: err.code });
+        })
+}
 
 exports.postOnePost = (req, res) => {
     //validate post fields
     const newPost = {
         title: req.body.title,
         scheme: req.body.scheme,
+        schemeId: req.body.schemeId,
         majorPremise: req.body.majorPremise,
         minorPremise: req.body.minorPremise,
         conclusion: req.body.conclusion,
