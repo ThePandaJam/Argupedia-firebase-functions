@@ -36,16 +36,33 @@ exports.getAllSchemes = (req, res) => {
         .catch(err => console.error(err));
 }
 //fetch the critical questions for a scheme
-exports.getCriticalQuestions = (req, res) => {
-    let criticalQuestions = []
-    db.doc(`/criticalQuestions/${req.params.schemeId}`)
+exports.getSchemeData = (req, res) => {
+    let schemeData = {}
+    db.doc(`/schemes/${req.params.schemeId}`)
         .get()
         .then(doc => {
             if(!doc.exists){
-                return res.status(404).json({ error: 'Scheme not found' })
+                return res.status(404).json({ error: 'Scheme info not found' })
             }
-            criticalQuestions = doc.data();
-            return res.json( criticalQuestions );
+            schemeData.schemeId = doc.id;
+            schemeData.premisesAndConclusion = doc.data();
+            return db
+                .collection('criticalQuestions')
+                .where('schemeId', '==', req.params.schemeId)
+                .orderBy('questionNo')  
+                .get();
+            
+        })
+        .then(data => {
+            schemeData.criticalQuestions = [];
+            data.forEach(doc => {
+                schemeData.criticalQuestions.push({
+                    questionNo: doc.data().questionNo,
+                    questionBody: doc.data().questionBody
+                    //...doc.data()
+                })
+            });
+            return res.json( schemeData );
         })
         .catch(err => {
             console.error(err);

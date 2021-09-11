@@ -22,7 +22,7 @@ const {
     downvoteArgument,
     unDownvoteArgument,
     getAllSchemes,
-    getCriticalQuestions
+    getSchemeData
 } = require('./handlers/posts')
 
 const { 
@@ -55,7 +55,7 @@ app.get('/argument/:argumentId/undownvote', FBAuth, unDownvoteArgument);
 app.delete('/post/:postId', FBAuth, deletePost);
 // schemes and critical questions routes
 app.get('/schemes', getAllSchemes)
-app.get('/critQuestions/:schemeId', getCriticalQuestions)
+app.get('/schemeData/:schemeId', getSchemeData)
 
 
 // user routes
