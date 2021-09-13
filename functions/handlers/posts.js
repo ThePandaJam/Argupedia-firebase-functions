@@ -142,6 +142,8 @@ exports.addArgumentToPost = (req, res) => {
     if(req.body.body.trim() === '') 
         return res.status(400).json({ comment: 'argument must not be empty'});
     const newArgument = {
+        schemeId: req.body.schemeId,
+        questionNo: req.body.questionNo,
         body: req.body.body,
         createdAt: new Date().toISOString(),
         postId: req.params.postId,
