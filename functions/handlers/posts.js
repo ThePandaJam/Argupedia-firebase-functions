@@ -142,6 +142,7 @@ exports.addArgumentToPost = (req, res) => {
     if(req.body.body.trim() === '') 
         return res.status(400).json({ comment: 'argument must not be empty'});
     const newArgument = {
+        respondingTo: req.body.respondingTo,
         schemeId: req.body.schemeId,
         questionNo: req.body.questionNo,
         body: req.body.body,
