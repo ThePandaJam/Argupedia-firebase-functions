@@ -158,7 +158,7 @@ exports.onUserImageChange = functions
     });
 
 //remove all comments, upvotes/downvotes and notifications when a post is deleted
-//TODO add downvotes to the list of deleted items 
+//TODO add attacks to the list of deleted items 
 exports.onPostDelete = functions
     .region('europe-west1')
     .firestore.document('/posts/{postId}')
@@ -188,9 +188,38 @@ exports.onPostDelete = functions
                 data.forEach(doc => {
                     batch.delete(db.doc(`/notifications/${doc.id}`));
                 })
+                return db.collection('attacks').where('postId', '==', postId).get();
+            })
+            .then(data => {
+                data.forEach(doc => {
+                    batch.delete(db.doc(`/attacks/${doc.id}`));
+                })
                 return batch.commit();
             })
             .catch(err => {
                 console.error(err);
             })
     })
+
+    exports.createAttackOnArgument = functions
+    .region('europe-west1')
+    .firestore.document('arguments/{id}')
+    .onCreate((snapshot) => {
+        return db
+            .doc(`/posts/${snapshot.data().postId}`)
+            .get()
+            .then(doc => {
+                if (doc.exists){
+                    return db.doc(`/attacks/${snapshot.id}`).set({
+                        postId: snapshot.data().postId,
+                        createdAt: new Date().toISOString(),
+                        source: snapshot.id,
+                        target: snapshot.data().respondingTo,
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                return;
+            })
+    });
