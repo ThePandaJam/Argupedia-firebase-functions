@@ -103,7 +103,7 @@ exports.postOnePost = (req, res) => {
         })
 }
 
-//fetch one post and its arguments
+//fetch one post, its arguments and graph data
 exports.getPost = (req, res) => {
     let postData = {}
     db.doc(`/posts/${req.params.postId}`)
@@ -122,10 +122,33 @@ exports.getPost = (req, res) => {
         })
         .then(data => {
             postData.comments = [];
+            //get nodes for a post's argument graph 
+            postData.graphData = {}
+            postData.graphData.nodes = [
+                {"id" : "Original-post"}
+            ]
             data.forEach(doc => {
                 postData.comments.push({
                     argumentId: doc.id,
                     ...doc.data()
+                })
+                postData.graphData.nodes.push({
+                    id: doc.id
+                })
+            });
+
+            return db
+                .collection('attacks')
+                .where('postId', '==', req.params.postId)
+                .get();
+        })
+        .then(data => {
+            //get links for a post's argument graph 
+            postData.graphData.links = []
+            data.forEach(doc => {
+                postData.graphData.links.push({
+                    source: doc.data().source,
+                    target: doc.data().target
                 })
             });
             return res.json( postData );
@@ -135,6 +158,7 @@ exports.getPost = (req, res) => {
             res.status(500).json({ error: err.code });
         })
 }
+
 // comment an argument on a post
 exports.addArgumentToPost = (req, res) => {
     //check that the argument body is not empty
