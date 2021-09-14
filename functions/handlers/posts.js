@@ -12,7 +12,6 @@ exports.getAllPosts = (req, res) => {
                 posts.push({
                     postId: doc.id,
                     ...doc.data()
-                    //userImage: doc.data().userImage
                 });
             });
             return res.json(posts);
@@ -20,20 +19,77 @@ exports.getAllPosts = (req, res) => {
         .catch(err => console.error(err));
 }
 
+exports.getAllSchemes = (req, res) => {
+    db.collection('schemes')
+        .orderBy('listOrder')
+        .get()
+        .then(data => {
+            let schemes = [];
+            data.forEach((doc) => {
+                schemes.push({
+                    schemeId: doc.id,
+                    ...doc.data()
+                });
+            });
+            return res.json(schemes);
+        })
+        .catch(err => console.error(err));
+}
+//fetch the critical questions for a scheme
+exports.getSchemeData = (req, res) => {
+    let schemeData = {}
+    db.doc(`/schemes/${req.params.schemeId}`)
+        .get()
+        .then(doc => {
+            if(!doc.exists){
+                return res.status(404).json({ error: 'Scheme info not found' })
+            }
+            schemeData.schemeId = doc.id;
+            schemeData.premisesAndConclusion = doc.data();
+            return db
+                .collection('criticalQuestions')
+                .where('schemeId', '==', req.params.schemeId)
+                .orderBy('questionNo')  
+                .get();
+            
+        })
+        .then(data => {
+            schemeData.criticalQuestions = [];
+            data.forEach(doc => {
+                schemeData.criticalQuestions.push({
+                    questionNo: doc.data().questionNo,
+                    questionBody: doc.data().questionBody
+                    //...doc.data()
+                })
+            });
+            return res.json( schemeData );
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: err.code });
+        })
+}
+
 exports.postOnePost = (req, res) => {
-    if(req.body.body.trim() === ''){
-        return res.status(400).json({ body: 'Post title must not be empty' });
-    }
-    //TODO: change body to title and add scheme
+    //validate post fields
     const newPost = {
-        body: req.body.body,
+        title: req.body.title,
+        scheme: req.body.scheme,
+        schemeId: req.body.schemeId,
+        majorPremise: req.body.majorPremise,
+        minorPremise: req.body.minorPremise,
+        conclusion: req.body.conclusion,
         userHandle: req.user.handle,
         userImage: req.user.imageUrl,
         createdAt: new Date().toISOString(),
         userScore: 0,
         argumentCount: 0
-
     }
+    
+    const { valid, errors } = validatePostData(newPost);
+    if (!valid) return res.status(400).json(errors)
+    //TODO: and add scheme
+    
     db.collection('posts')
         .add(newPost)
         .then(doc => {
@@ -86,6 +142,9 @@ exports.addArgumentToPost = (req, res) => {
     if(req.body.body.trim() === '') 
         return res.status(400).json({ comment: 'argument must not be empty'});
     const newArgument = {
+        respondingTo: req.body.respondingTo,
+        schemeId: req.body.schemeId,
+        questionNo: req.body.questionNo,
         body: req.body.body,
         createdAt: new Date().toISOString(),
         postId: req.params.postId,
